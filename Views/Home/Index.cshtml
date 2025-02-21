@@ -12,14 +12,14 @@
 }
 @inject IStringLocalizer<HomeController> localizer;
 @inject IViewLocalizer Viewlocalizer;
-
+@inject IOptions<RequestLocalizationOptions> LocOptions;
 
 
 @if (culture.ToString() == "fa-IR")
 {
     <style>
-        body{
-        direction:rtl;
+        body {
+            direction: rtl;
         }
     </style>
 }
@@ -40,3 +40,28 @@
 
 </h1>
 
+@{
+    string returnUrl = ViewContext.HttpContext.Request.Path;
+    var requestCultures = Context.Features.Get<IRequestCultureFeature>();
+    var cultureItems = LocOptions.Value.SupportedUICultures.
+    Select(c => new SelectListItem { Value = c.Name, Text = c.DisplayName })
+    .ToList();
+
+}
+
+<fieldset>
+    <legend>
+        Change Languge
+    </legend>
+
+    <form asp-action="ChangeLanguge" asp-controller="Home" method="post">
+        <input type="hidden" name="returnUrl" value="@returnUrl" />
+        <select id="culture"
+                name="culture"
+                class="form-control"
+                asp-items="cultureItems"
+                asp-for="@requestCultures.RequestCulture.UICulture.Name"
+                onchange="this.form.submit();">
+        </select>
+    </form>
+</fieldset>
